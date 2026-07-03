@@ -156,6 +156,23 @@
     box-shadow:0 4px 16px rgba(0,0,0,.25); opacity:0; transition:.3s; pointer-events:none; z-index:99;
   }
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+  /* ---- layout escritorio ---- */
+  @media (min-width:1000px){
+    body{max-width:1180px; padding:24px 28px}
+    header{padding:24px 0 14px}
+    header h1{font-size:2rem}
+    .cols{display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start}
+    .col{min-width:0}
+    .col .card{margin:0 0 18px 0}
+    .card{padding:22px}
+    .card:hover{box-shadow:0 3px 12px rgba(0,0,0,.07)}
+    .pg-portals{grid-template-columns:repeat(4,1fr)}
+    .track-form{grid-template-columns:2fr 1fr 2fr}
+    .track-form input.full{grid-column:span 3}
+    .track-add{grid-column:span 3}
+    .backup-btns{max-width:420px}
+  }
 </style>
 </head>
 <body>
@@ -165,7 +182,7 @@
   <p>Tus búsquedas, tu kit y tu seguimiento en un solo lugar</p>
 </header>
 
-<div class="card">
+<div class="card" id="c1">
   <h2><span class="num">1</span> ¿Qué buscás?</h2>
   <label>Puestos (Enter para agregar)</label>
   <input type="text" id="puestoInput" placeholder="ej: administrativo, data entry...">
@@ -179,32 +196,32 @@
   </div>
 </div>
 
-<div class="card">
+<div class="card" id="c2">
   <h2><span class="num">2</span> Buscar en los portales</h2>
   <div id="puestoGroups"></div>
   <div class="hint">El botón verde abre los 4 portales de una para ese puesto. (Si el navegador bloquea las pestañas, permití pop-ups para este sitio.)</div>
 </div>
 
-<div class="card">
+<div class="card" id="c3">
   <h2><span class="num">3</span> Kit de respuestas rápidas</h2>
   <p class="hint" style="margin-top:0;margin-bottom:12px">Respuestas tipo para los prefiltros. <strong>Personalizá 1 o 2 frases antes de enviar</strong> para que no parezca copiado. Se guardan solas.</p>
   <div id="kitContainer"></div>
   <div class="save-note">💾 Se guarda automáticamente en este dispositivo.</div>
 </div>
 
-<div class="card">
+<div class="card" id="c4">
   <h2><span class="num">4</span> CV resumido para pegar</h2>
   <p class="hint" style="margin-top:0;margin-bottom:12px">Tu perfil y contacto listos para copiar cuando un aviso pide "contame de vos" o un mensaje a un reclutador.</p>
   <div id="cvContainer"></div>
 </div>
 
-<div class="card">
+<div class="card" id="c5">
   <h2><span class="num">5</span> Antes de postularte, chequeá</h2>
   <div id="checklist"></div>
   <button class="btn" style="background:var(--line);color:var(--text);width:100%;margin-top:12px;font-size:.82rem;padding:9px" id="resetCheck">↺ Destildar todo (para la próxima oferta)</button>
 </div>
 
-<div class="card">
+<div class="card" id="c6">
   <h2><span class="num">6</span> Dónde me postulé</h2>
   <div class="stats-row" id="statsRow"></div>
   <div class="weeks-mini" id="weeksMini"></div>
@@ -219,7 +236,7 @@
   <div class="hint">⏰ Si una postulación lleva 7+ días en "pendiente", te lo marca: es buen momento para mandar un mensaje de seguimiento.</div>
 </div>
 
-<div class="card">
+<div class="card" id="c7">
   <h2><span class="num">7</span> Backup</h2>
   <p class="hint" style="margin-top:0;margin-bottom:12px">Guarda todo (puestos, kit, CV y postulaciones) en un archivo JSON. Si cambiás de teléfono o se borran los datos del navegador, lo importás y listo.</p>
   <div class="backup-btns">
@@ -558,6 +575,29 @@ document.getElementById("importFile").addEventListener("change",e=>{
 });
 
 renderChips(); renderGroups(); renderKit(); renderCV(); renderChecklist(); renderTracker();
+
+// ---------- LAYOUT ESCRITORIO ----------
+function applyLayout(){
+  if(!window.matchMedia) return;
+  const wide = window.matchMedia("(min-width:1000px)").matches;
+  const holder = document.getElementById("cols");
+  const footer = document.querySelector("footer");
+  if(wide && !holder){
+    const wrap = document.createElement("div"); wrap.id="cols"; wrap.className="cols";
+    const a = document.createElement("div"); a.className="col";
+    const b = document.createElement("div"); b.className="col";
+    ["c1","c2","c5","c7"].forEach(id=>a.appendChild(document.getElementById(id)));
+    ["c6","c3","c4"].forEach(id=>b.appendChild(document.getElementById(id)));
+    wrap.appendChild(a); wrap.appendChild(b);
+    document.body.insertBefore(wrap, footer);
+  } else if(!wide && holder){
+    ["c1","c2","c3","c4","c5","c6","c7"].forEach(id=>document.body.insertBefore(document.getElementById(id), holder));
+    holder.remove();
+  }
+}
+window.addEventListener("resize", applyLayout);
+applyLayout();
+
 </script>
 </body>
 </html>
